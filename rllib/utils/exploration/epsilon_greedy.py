@@ -130,7 +130,8 @@ class EpsilonGreedy(Exploration):
             tf.random.uniform(
                 tf.stack([batch_size]), minval=0, maxval=1, dtype=tf.float32
             )
-            < epsilon
+            # < epsilon
+            < tf.cast(epsilon,tf.float32)
         )
 
         action = tf.cond(
