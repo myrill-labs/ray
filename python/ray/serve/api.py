@@ -106,7 +106,9 @@ class Client:
         self._shutdown = False
         self._http_config: HTTPOptions = ray.get(
             controller.get_http_config.remote())
-        self._root_url = ray.get(self._controller.get_root_url.remote())
+        self._root_url = ray.get(controller.get_root_url.remote())
+        self._checkpoint_path = ray.get(
+            controller.get_checkpoint_path.remote())
 
         # Each handle has the overhead of long poll client, therefore cached.
         self.handle_cache = dict()
@@ -125,6 +127,14 @@ class Client:
     @property
     def root_url(self):
         return self._root_url
+
+    @property
+    def http_config(self):
+        return self._http_config
+
+    @property
+    def checkpoint_path(self):
+        return self._checkpoint_path
 
     def __del__(self):
         if not self._detached:
@@ -226,6 +236,13 @@ class Client:
             raise TypeError(
                 "config must be a DeploymentConfig or a dictionary.")
 
+        if deployment_config.autoscaling_config is not None and \
+            deployment_config.max_concurrent_queries < deployment_config. \
+                autoscaling_config.target_num_ongoing_requests_per_replica:
+            logger.warning("Autoscaling will never happen, "
+                           "because 'max_concurrent_queries' is less than "
+                           "'target_num_ongoing_requests_per_replica' now.")
+
         goal_id, updating = ray.get(
             self._controller.deploy.remote(name,
                                            deployment_config.to_proto_bytes(),
@@ -273,17 +290,17 @@ class Client:
     @_ensure_connected
     def get_handle(
             self,
-            endpoint_name: str,
+            deployment_name: str,
             missing_ok: Optional[bool] = False,
             sync: bool = True,
             _internal_pickled_http_request: bool = False,
     ) -> Union[RayServeHandle, RayServeSyncHandle]:
-        """Retrieve RayServeHandle for service endpoint to invoke it from Python.
+        """Retrieve RayServeHandle for service deployment to invoke it from Python.
 
         Args:
-            endpoint_name (str): A registered service endpoint.
-            missing_ok (bool): If true, then Serve won't check the endpoint is
-                registered. False by default.
+            deployment_name (str): A registered service deployment.
+            missing_ok (bool): If true, then Serve won't check the deployment
+                is registered. False by default.
             sync (bool): If true, then Serve will return a ServeHandle that
                 works everywhere. Otherwise, Serve will return a ServeHandle
                 that's only usable in asyncio loop.
@@ -291,15 +308,15 @@ class Client:
         Returns:
             RayServeHandle
         """
-        cache_key = (endpoint_name, missing_ok, sync)
+        cache_key = (deployment_name, missing_ok, sync)
         if cache_key in self.handle_cache:
             cached_handle = self.handle_cache[cache_key]
             if cached_handle.is_polling and cached_handle.is_same_loop:
                 return cached_handle
 
         all_endpoints = ray.get(self._controller.get_all_endpoints.remote())
-        if not missing_ok and endpoint_name not in all_endpoints:
-            raise KeyError(f"Endpoint '{endpoint_name}' does not exist.")
+        if not missing_ok and deployment_name not in all_endpoints:
+            raise KeyError(f"Deployment '{deployment_name}' does not exist.")
 
         try:
             asyncio_loop_running = asyncio.get_event_loop().is_running()
@@ -327,13 +344,13 @@ class Client:
         if sync:
             handle = RayServeSyncHandle(
                 self._controller,
-                endpoint_name,
+                deployment_name,
                 _internal_pickled_http_request=_internal_pickled_http_request,
             )
         else:
             handle = RayServeHandle(
                 self._controller,
-                endpoint_name,
+                deployment_name,
                 _internal_pickled_http_request=_internal_pickled_http_request,
             )
 
@@ -356,6 +373,35 @@ class Client:
             self.handle_cache.pop(evict_key)
 
         return handle
+
+
+def _check_http_and_checkpoint_options(
+        client: Client,
+        http_options: Union[dict, HTTPOptions],
+        checkpoint_path: str,
+) -> None:
+    if checkpoint_path and checkpoint_path != client.checkpoint_path:
+        logger.warning(
+            f"The new client checkpoint path '{checkpoint_path}' "
+            f"is different from the existing one '{client.checkpoint_path}'. "
+            "The new checkpoint path is ignored.")
+
+    if http_options:
+        client_http_options = client.http_config
+        new_http_options = http_options if isinstance(
+            http_options, HTTPOptions) else HTTPOptions.parse_obj(http_options)
+        different_fields = []
+        all_http_option_fields = new_http_options.__dict__
+        for field in all_http_option_fields:
+            if getattr(new_http_options, field) != getattr(
+                    client_http_options, field):
+                different_fields.append(field)
+
+        if len(different_fields):
+            logger.warning(
+                "The new client HTTP config differs from the existing one "
+                f"in the following fields: {different_fields}. "
+                "The new HTTP config is ignored.")
 
 
 @PublicAPI(stability="beta")
@@ -418,6 +464,10 @@ def start(
         client = _get_global_client()
         logger.info("Connecting to existing Serve instance in namespace "
                     f"'{controller_namespace}'.")
+
+        _check_http_and_checkpoint_options(client, http_options,
+                                           _checkpoint_path)
+
         return client
     except RayServeException:
         pass
