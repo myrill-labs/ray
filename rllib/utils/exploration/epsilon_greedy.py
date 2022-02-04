@@ -118,7 +118,7 @@ class EpsilonGreedy(Exploration):
 
         chose_random = tf.random.uniform(
             tf.stack([batch_size]), minval=0, maxval=1,
-            dtype=tf.float32) < epsilon
+            dtype=tf.float32) < tf.cast(epsilon, tf.float32)
 
         action = tf.cond(
             pred=tf.constant(explore, dtype=tf.bool)
