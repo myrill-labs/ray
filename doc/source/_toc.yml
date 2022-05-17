@@ -26,9 +26,6 @@ parts:
           - file: train/examples
           - file: train/faq
           - file: train/architecture
-          - file: train/migration-guide
-          - file: raysgd/raysgd
-            title: "RaySGD v1: Distributed Training Wrappers"
           - file: train/api
 
       - file: tune/index
@@ -65,12 +62,18 @@ parts:
       - file: serve/index
         title: Ray Serve
         sections:
-          - file: serve/end_to_end_tutorial
+          - file: serve/getting_started
           - file: serve/core-apis
           - file: serve/http-servehandle
-          - file: serve/deployment
           - file: serve/ml-models
           - file: serve/deployment-graph
+            sections:
+              - file: serve/deployment-graph/deployment-graph-e2e-tutorial
+              - file: serve/deployment-graph/deployment-graph-user-guides
+                sections:
+                   - file: serve/deployment-graph/chain_nodes_same_class_different_args
+          - file: serve/deployment
+          - file: serve/monitoring
           - file: serve/performance
           - file: serve/architecture
           - file: serve/tutorials/index
@@ -107,6 +110,22 @@ parts:
           - file: workflows/package-ref
       - file: ray-more-libs/index
         title: More Ray ML Libraries
+        sections:
+          - file: ray-air/getting-started
+            sections:
+              - file: ray-air/key-concepts
+              - file: ray-air/deployment
+              - file: ray-air/examples/index
+              - file: ray-air/package-ref
+          - file: ray-more-libs/joblib
+          - file: ray-more-libs/lightgbm-ray
+          - file: ray-more-libs/multiprocessing
+          - file: ray-more-libs/ray-collective
+          - file: ray-more-libs/ray-lightning
+          - file: ray-core/examples/using-ray-with-pytorch-lightning
+          - file: ray-more-libs/xgboost-ray
+          - file: ray-core/examples/dask_xgboost/dask_xgboost
+          - file: ray-core/examples/modin_xgboost/modin_xgboost
 
   - caption: Ray Core
     chapters:
@@ -134,6 +153,7 @@ parts:
       - file: cluster/cloud
       - file: cluster/deploy
       - file: cluster/api
+      - file: cluster/usage-stats
 
   - caption: References
     chapters:

@@ -11,6 +11,52 @@ py_test(
     deps = [":ml_lib"]
 )
 
+py_test(
+    name = "distributed_sage_example",
+    size = "large",
+    main = "examples/pytorch_geometric/distributed_sage_example.py",
+    srcs = ["examples/pytorch_geometric/distributed_sage_example.py"],
+    tags = ["team:ml", "exclusive", "gpu"],
+    deps = [":ml_lib"],
+    args = ["--use-gpu", "--num-workers=2", "--epochs=1", "--dataset=fake"]
+)
+
+py_test(
+    name = "horovod_cifar_pbt_example",
+    size = "medium",
+    srcs = ["examples/horovod/horovod_cifar_pbt_example.py"],
+    tags = ["team:ml", "exlusive"],
+    deps = [":ml_lib"],
+    args = ["--smoke-test"]
+)
+
+py_test(
+    name = "horovod_pytorch_example",
+    size = "medium",
+    srcs = ["examples/horovod/horovod_pytorch_example.py"],
+    tags = ["team:ml", "exclusive"],
+    deps = [":ml_lib"],
+    args = ["--num-epochs=1"]
+)
+
+py_test(
+    name = "horovod_tune_example",
+    size = "medium",
+    srcs = ["examples/horovod/horovod_tune_example.py"],
+    tags = ["team:ml", "exclusive"],
+    deps = [":ml_lib"],
+    args = ["--smoke-test"]
+)
+
+py_test (
+    name = "huggingface_basic_language_modeling_example",
+    size = "medium",
+    srcs = ["examples/huggingface/huggingface_basic_language_modeling_example.py"],
+    args = ["--smoke-test", "--num-epochs 3"],
+    tags = ["team:ml", "exclusive"],
+    deps = [":ml_lib"]
+)
+
 py_test (
     name = "lightgbm_example",
     size = "medium",
@@ -19,11 +65,39 @@ py_test (
     deps = [":ml_lib"]
 )
 
+py_test (
+    name = "rl_example_offline",
+    main = "examples/rl_example.py",
+    size = "medium",
+    srcs = ["examples/rl_example.py"],
+    args = ["--offline"],
+    tags = ["team:ml", "exclusive"],
+    deps = [":ml_lib"]
+)
+
+py_test (
+    name = "rl_example_online",
+    main = "examples/rl_example.py",
+    size = "medium",
+    srcs = ["examples/rl_example.py"],
+    tags = ["team:ml", "exclusive"],
+    deps = [":ml_lib"]
+)
+
+py_test (
+    name = "rl_serving_example",
+    main = "examples/rl_serving_example.py",
+    size = "medium",
+    srcs = ["examples/rl_serving_example.py"],
+    tags = ["team:ml", "exclusive"],
+    deps = [":ml_lib"]
+)
+
 py_test(
     name = "tensorflow_linear_dataset_example",
     size = "medium",
-    main = "examples/tensorflow/tensorflow_linear_dataset_example.py",
-    srcs = ["examples/tensorflow/tensorflow_linear_dataset_example.py"],
+    main = "examples/tf/tensorflow_linear_dataset_example.py",
+    srcs = ["examples/tf/tensorflow_linear_dataset_example.py"],
     tags = ["team:ml", "exclusive"],
     deps = [":ml_lib"],
     args = ["--smoke-test"]
@@ -32,8 +106,8 @@ py_test(
 py_test(
     name = "tensorflow_mnist_example",
     size = "medium",
-    main = "examples/tensorflow/tensorflow_mnist_example.py",
-    srcs = ["examples/tensorflow/tensorflow_mnist_example.py"],
+    main = "examples/tf/tensorflow_mnist_example.py",
+    srcs = ["examples/tf/tensorflow_mnist_example.py"],
     tags = ["team:ml", "exclusive"],
     deps = [":ml_lib"],
     args = ["--smoke-test"]
@@ -82,8 +156,8 @@ py_test(
 py_test(
     name = "tune_tensorflow_mnist_example",
     size = "medium",
-    main = "examples/tensorflow/tune_tensorflow_mnist_example.py",
-    srcs = ["examples/tensorflow/tune_tensorflow_mnist_example.py"],
+    main = "examples/tf/tune_tensorflow_mnist_example.py",
+    srcs = ["examples/tf/tune_tensorflow_mnist_example.py"],
     tags = ["team:ml", "exclusive"],
     deps = [":ml_lib"],
     args = ["--smoke-test"]
@@ -97,6 +171,30 @@ py_test(
     tags = ["team:ml", "exclusive"],
     deps = [":ml_lib"],
     args = ["--smoke-test"]
+)
+
+py_test(
+    name = "sklearn_example",
+    size = "medium",
+    srcs = ["examples/sklearn_example.py"],
+    tags = ["team:ml", "exclusive"],
+    deps = [":ml_lib"]
+)
+
+py_test(
+    name = "upload_to_comet_ml",
+    size = "medium",
+    srcs = ["examples/upload_to_comet_ml.py"],
+    tags = ["team:ml", "exclusive", "needs_credentials"],
+    deps = [":ml_lib"]
+)
+
+py_test(
+    name = "upload_to_wandb",
+    size = "medium",
+    srcs = ["examples/upload_to_wandb.py"],
+    tags = ["team:ml", "exclusive", "needs_credentials"],
+    deps = [":ml_lib"]
 )
 
 py_test(
@@ -146,6 +244,22 @@ py_test(
 )
 
 py_test(
+    name = "test_huggingface_predictor",
+    size = "small",
+    srcs = ["tests/test_huggingface_predictor.py"],
+    tags = ["team:ml", "exclusive"],
+    deps = [":ml_lib"]
+)
+
+py_test(
+    name = "test_huggingface_trainer",
+    size = "medium",
+    srcs = ["tests/test_huggingface_trainer.py"],
+    tags = ["team:ml", "exclusive"],
+    deps = [":ml_lib"]
+)
+
+py_test(
     name = "test_lightgbm_predictor",
     size = "small",
     srcs = ["tests/test_lightgbm_predictor.py"],
@@ -178,9 +292,25 @@ py_test(
 )
 
 py_test(
-    name = "test_trainer",
+    name = "test_rl_predictor",
+    size = "small",
+    srcs = ["tests/test_rl_predictor.py"],
+    tags = ["team:ml", "exclusive"],
+    deps = [":ml_lib"]
+)
+
+py_test(
+    name = "test_sklearn_predictor",
+    size = "small",
+    srcs = ["tests/test_sklearn_predictor.py"],
+    tags = ["team:ml", "exclusive"],
+    deps = [":ml_lib"]
+)
+
+py_test(
+    name = "test_sklearn_trainer",
     size = "medium",
-    srcs = ["tests/test_trainer.py"],
+    srcs = ["tests/test_sklearn_trainer.py"],
     tags = ["team:ml", "exclusive"],
     deps = [":ml_lib"]
 )
@@ -221,6 +351,14 @@ py_test(
     name = "test_torch_utils",
     size = "small",
     srcs = ["tests/test_torch_utils.py"],
+    tags = ["team:ml", "exclusive"],
+    deps = [":ml_lib"]
+)
+
+py_test(
+    name = "test_trainer",
+    size = "medium",
+    srcs = ["tests/test_trainer.py"],
     tags = ["team:ml", "exclusive"],
     deps = [":ml_lib"]
 )

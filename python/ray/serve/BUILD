@@ -101,6 +101,14 @@ py_test(
 )
 
 py_test(
+    name = "test_logging",
+    size = "medium",
+    srcs = serve_tests_srcs,
+    tags = ["exclusive", "team:serve"],
+    deps = [":serve_lib"],
+)
+
+py_test(
     name = "test_metrics",
     size = "medium",
     srcs = serve_tests_srcs,
@@ -244,7 +252,7 @@ py_test(
 
 py_test(
     name = "test_standalone2",
-    size = "medium",
+    size = "large",
     srcs = serve_tests_srcs,
     tags = ["exclusive", "team:serve"],
     deps = [":serve_lib"],
@@ -356,8 +364,16 @@ py_test(
 )
 
 py_test(
-    name = "test_pipeline_ingress_deployment",
+    name = "test_deployment_graph_classmethod",
     size = "medium",
+    srcs = serve_tests_srcs,
+    tags = ["exclusive", "team:serve"],
+    deps = [":serve_lib"],
+)
+
+py_test(
+    name = "test_pipeline_ingress_deployment",
+    size = "small",
     srcs = serve_tests_srcs,
     tags = ["exclusive", "team:serve"],
     deps = [":serve_lib"],
@@ -443,6 +459,13 @@ py_test(
     name = "tutorial_sklearn_ray_overview",
     size = "small",
     main = "quick_start.py",
+    srcs = ["//doc/source/serve/doc_code:serve_doc_code"],
+    tags = ["exclusive", "team:serve"],
+)
+
+py_test(
+    name = "deployment_graph_same_class_different_args",
+    size = "small",
     srcs = ["//doc/source/serve/doc_code:serve_doc_code"],
     tags = ["exclusive", "team:serve"],
 )

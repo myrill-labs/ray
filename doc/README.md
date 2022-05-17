@@ -29,7 +29,7 @@ To build just this one sub-project, and ignore the rest
 DOC_LIB=<project> sphinx-build -b html -d _build/doctrees  source _build/html
 ```
 where `<project>` is the name of the sub-project and can be any of the docs projects in the `source/`
-directory either called `tune`, `rllib`, `train`, `cluster`, `serve`, `raysgd`, `data` or the ones starting
+directory either called `tune`, `rllib`, `train`, `cluster`, `serve`, `data` or the ones starting
 with `ray-`, e.g. `ray-observability`.
 
 ## Announcements and includes
@@ -130,4 +130,4 @@ Please note that the parsing is extremely simple (regex replace) and will not su
 
 ## Testing changes locally
 
-If you want to run the preprocessing locally on a specific file (to eg. see how it will render after docs have been built), run `source/preprocess_github_markdown.py PATH_TO_MARKDOWN_FILE`. Make sure to also edit `EXTERNAL_MARKDOWN_FILES` in `source/custom_directives.py` so that your file does not get overwriten by one downloaded form GitHub.
+If you want to run the preprocessing locally on a specific file (to eg. see how it will render after docs have been built), run `source/preprocess_github_markdown.py PATH_TO_MARKDOWN_FILE PATH_TO_PREPROCESSED_MARKDOWN_FILE`. Make sure to also edit `EXTERNAL_MARKDOWN_FILES` in `source/custom_directives.py` so that your file does not get overwriten by one downloaded form GitHub.
