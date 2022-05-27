@@ -281,6 +281,17 @@ class Trial:
         self.trainable_name = trainable_name
         self.trial_id = Trial.generate_id() if trial_id is None else trial_id
         self.config = config or {}
+
+        ####################################
+        ######## MYRILL ADDITION     #######
+        ####################################
+        if "update_trial_config" in self.config:
+            self.config = self.config["update_trial_config"](self.config, self.trainable_name, self.trial_id)
+            assert "chronos_server" in config["env_config"]["params"]
+        ####################################
+        ####################################
+        ####################################
+
         self.local_dir = local_dir  # This remains unexpanded for syncing.
 
         # Parameters that Tune varies across searches.
