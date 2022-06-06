@@ -287,7 +287,7 @@ class Trial:
         ####################################
         update_trial_config = self.config["env_config"]["params"].get("update_trial_config", None)
         if update_trial_config is not None:
-            self.config = update_trial_config(self.config, self.trainable_name, self.trial_id)
+            self.config = update_trial_config(self.config, self.trainable_name, self.trial_id, evaluated_params)
             assert "chronos_server" in config["env_config"]["params"]
         ####################################
         ####################################
