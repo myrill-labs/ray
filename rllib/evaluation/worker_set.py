@@ -403,6 +403,7 @@ class WorkerSet:
         # Remote workers: Index > 0.
         remote_results = ray.get(
             [w.apply.remote(func, i + 1) for i, w in enumerate(self.remote_workers())]
+            ,timeout=10 # added by Myrill, see trello#836
         )
         return local_result + remote_results
 
